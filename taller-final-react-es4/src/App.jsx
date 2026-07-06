@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import Tarjeta from './components/Tarjeta';
+import Buscador from './components/Buscador';
 
 export default function App() {
   const [elementos, setElementos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
     const obtenerPokemons = async () => {
@@ -39,6 +41,10 @@ export default function App() {
     obtenerPokemons();
   }, []);
 
+  const elementosFiltrados = elementos.filter((pokemon) =>
+    pokemon.name.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   if (cargando) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-[#e6f7ef] gap-4">
@@ -62,17 +68,25 @@ export default function App() {
     <div className="min-h-screen bg-[#e6f7ef] p-6 md:p-10 font-sans text-slate-700">
       <div className="max-w-6xl mx-auto">
         
-        <header className="text-center mb-10">
+        <header className="text-center mb-6">
           <h1 className="text-3xl font-black text-[#0f6c70] tracking-widest uppercase mb-1">
-            Pokédex <span className="text-slate-400 font-light text-xl font-mono lowercase tracking-normal"></span>
+            Pokédex <span className="text-slate-400 font-light text-xl font-mono lowercase tracking-normal">v1.0</span>
           </h1>
           <p className="text-lg font-medium text-[#107b80] tracking-wide">
             Conoce a los Pokémon
           </p>
         </header>
 
+        <Buscador busqueda={busqueda} setBusqueda={setBusqueda} />
+
+        {elementosFiltrados.length === 0 && (
+          <p className="text-center text-slate-400 mb-10 text-sm font-medium italic">
+            No se encontraron resultados para "{busqueda}"
+          </p>
+        )}
+
         <main className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {elementos.map((pokemon) => (
+          {elementosFiltrados.map((pokemon) => (
             <Tarjeta key={pokemon.id} elemento={pokemon} />
           ))}
         </main>
