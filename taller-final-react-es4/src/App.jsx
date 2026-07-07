@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import Tarjeta from './components/Tarjeta';
+import Buscador from './components/Buscador';
+import PanelFavoritos from './components/PanelFavoritos';
 
 export default function App() {
   const [elementos, setElementos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [busqueda, setBusqueda] = useState('');
+  const [favoritos, setFavoritos] = useState([]);
 
   useEffect(() => {
     const obtenerPokemons = async () => {
@@ -39,6 +43,19 @@ export default function App() {
     obtenerPokemons();
   }, []);
 
+  const manejarAlternarFavorito = (pokemon) => {
+    const yaExiste = favoritos.some((fav) => fav.id === pokemon.id);
+    if (yaExiste) {
+      setFavoritos(favoritos.filter((fav) => fav.id !== pokemon.id));
+    } else {
+      setFavoritos([...favoritos, pokemon]);
+    }
+  };
+
+  const elementosFiltrados = elementos.filter((pokemon) =>
+    pokemon.name.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   if (cargando) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-[#e6f7ef] gap-4">
@@ -59,23 +76,47 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#e6f7ef] p-6 md:p-10 font-sans text-slate-700">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#e6f7ef] p-4 md:p-10 font-sans text-slate-700">
+      <div className="max-w-7xl mx-auto">
         
-        <header className="text-center mb-10">
+        <header className="text-center mb-6">
           <h1 className="text-3xl font-black text-[#0f6c70] tracking-widest uppercase mb-1">
-            Pokédex <span className="text-slate-400 font-light text-xl font-mono lowercase tracking-normal"></span>
+            Pokédex <span className="text-slate-400 font-light text-xl font-mono lowercase tracking-normal">v1.0</span>
           </h1>
           <p className="text-lg font-medium text-[#107b80] tracking-wide">
             Conoce a los Pokémon
           </p>
         </header>
 
-        <main className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {elementos.map((pokemon) => (
-            <Tarjeta key={pokemon.id} elemento={pokemon} />
-          ))}
-        </main>
+        <Buscador busqueda={busqueda} setBusqueda={setBusqueda} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+          
+          <div className="lg:col-span-3">
+            {elementosFiltrados.length === 0 && (
+              <p className="text-center text-slate-400 my-10 text-sm font-medium italic">
+                No se encontraron resultados para "{busqueda}"
+              </p>
+            )}
+            
+            <main className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {elementosFiltrados.map((pokemon) => (
+                <Tarjeta 
+                  key={pokemon.id} 
+                  elemento={pokemon} 
+                  esFavorito={favoritos.some((fav) => fav.id === pokemon.id)}
+                  alAlternarFavorito={manejarAlternarFavorito}
+                />
+              ))}
+            </main>
+          </div>
+
+          <PanelFavoritos 
+            favoritos={favoritos} 
+            alAlternarFavorito={manejarAlternarFavorito} 
+          />
+
+        </div>
 
       </div>
     </div>
