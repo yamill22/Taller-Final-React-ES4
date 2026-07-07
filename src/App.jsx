@@ -3,7 +3,7 @@ import Tarjeta from "./components/Tarjeta";
 import Buscador from "./components/Buscador";
 import PanelFavoritos from "./components/PanelFavoritos";
 import PanelBloqueados from "./components/PanelBloqueados";
-import useLocalStorage from "./hooks/useLocalStorage"; 
+import useLocalStorage from "./hooks/useLocalStorage";
 
 export default function App() {
   const [elementos, setElementos] = useState([]);
@@ -13,14 +13,14 @@ export default function App() {
   const [busqueda, setBusqueda] = useState("");
 
   const [favoritos, setFavoritos] = useLocalStorage(
-  "favoritos",
-  []
-);
+    "favoritos",
+    []
+  );
 
-const [bloqueados, setBloqueados] = useLocalStorage(
-  "bloqueados",
-  []
-);
+  const [bloqueados, setBloqueados] = useLocalStorage(
+    "bloqueados",
+    []
+  );
 
   useEffect(() => {
     const obtenerPokemons = async () => {
@@ -32,7 +32,9 @@ const [bloqueados, setBloqueados] = useLocalStorage(
         );
 
         if (!respuesta.ok) {
-          throw new Error("Hubo un problema al conectar con la PokeAPI");
+          throw new Error(
+            "Hubo un problema al conectar con la PokeAPI"
+          );
         }
 
         const datos = await respuesta.json();
@@ -60,11 +62,15 @@ const [bloqueados, setBloqueados] = useLocalStorage(
   }, []);
 
   const manejarAlternarFavorito = (pokemon) => {
-    const existe = favoritos.some((fav) => fav.id === pokemon.id);
+    const existe = favoritos.some(
+      (fav) => fav.id === pokemon.id
+    );
 
     if (existe) {
       setFavoritos(
-        favoritos.filter((fav) => fav.id !== pokemon.id)
+        favoritos.filter(
+          (fav) => fav.id !== pokemon.id
+        )
       );
     } else {
       setFavoritos([...favoritos, pokemon]);
@@ -72,19 +78,25 @@ const [bloqueados, setBloqueados] = useLocalStorage(
   };
 
   const manejarBloquearPokemon = (pokemon) => {
-    if (bloqueados.some((p) => p.id === pokemon.id)) return;
+    if (
+      bloqueados.some((bloq) => bloq.id === pokemon.id)
+    )
+      return;
 
     setBloqueados([...bloqueados, pokemon]);
 
-    // Si estaba en favoritos, lo elimina automáticamente
-    setFavoritos((prev) =>
-      prev.filter((fav) => fav.id !== pokemon.id)
+    setFavoritos(
+      favoritos.filter(
+        (fav) => fav.id !== pokemon.id
+      )
     );
   };
 
   const manejarDesbloquearPokemon = (pokemon) => {
     setBloqueados(
-      bloqueados.filter((p) => p.id !== pokemon.id)
+      bloqueados.filter(
+        (bloq) => bloq.id !== pokemon.id
+      )
     );
   };
 
@@ -96,7 +108,9 @@ const [bloqueados, setBloqueados] = useLocalStorage(
     )
     .filter(
       (pokemon) =>
-        !bloqueados.some((b) => b.id === pokemon.id)
+        !bloqueados.some(
+          (bloq) => bloq.id === pokemon.id
+        )
     );
 
   if (cargando) {
@@ -142,6 +156,42 @@ const [bloqueados, setBloqueados] = useLocalStorage(
           setBusqueda={setBusqueda}
         />
 
+        {/* Estadísticas */}
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+
+          <div className="bg-white rounded-2xl shadow-sm border-2 border-[#bcecd4] p-4 text-center">
+            <h2 className="text-3xl font-black text-[#107b80]">
+              {elementos.length}
+            </h2>
+
+            <p className="text-sm text-slate-500 font-semibold">
+              Total Pokémon
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border-2 border-yellow-200 p-4 text-center">
+            <h2 className="text-3xl font-black text-yellow-500">
+              {favoritos.length}
+            </h2>
+
+            <p className="text-sm text-slate-500 font-semibold">
+              Favoritos
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border-2 border-red-200 p-4 text-center">
+            <h2 className="text-3xl font-black text-red-500">
+              {bloqueados.length}
+            </h2>
+
+            <p className="text-sm text-slate-500 font-semibold">
+              Bloqueados
+            </p>
+          </div>
+
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
 
           <div className="lg:col-span-3">
@@ -152,7 +202,7 @@ const [bloqueados, setBloqueados] = useLocalStorage(
               </p>
             )}
 
-            <main className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
 
               {elementosFiltrados.map((pokemon) => (
                 <Tarjeta
@@ -170,7 +220,7 @@ const [bloqueados, setBloqueados] = useLocalStorage(
 
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 lg:sticky lg:top-6">
 
             <PanelFavoritos
               favoritos={favoritos}
@@ -185,6 +235,21 @@ const [bloqueados, setBloqueados] = useLocalStorage(
           </div>
 
         </div>
+        <footer className="mt-10 bg-white border-2 border-[#bcecd4] rounded-2xl shadow-sm p-5 text-center">
+          <h3 className="text-lg font-bold text-[#0f6c70] mb-2">
+            Integrantes
+          </h3>
+
+          <div className="flex flex-col md:flex-row justify-center gap-2 md:gap-8 text-slate-600 font-medium">
+            <span>Gohans Tapia</span>
+            <span>Yamil Nayen</span> 
+            {/* <span>Integrante 3</span> */}
+          </div>
+
+          <p className="mt-4 text-xs text-slate-400">
+            Taller Final React ES4 • Pokédex v1.0
+          </p>
+        </footer>
 
       </div>
     </div>
